@@ -17,7 +17,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    sh 'docker build -t mamatha0124/helloworld-java:v3 .'
                 }
             }
         }
@@ -26,7 +26,7 @@ pipeline {
             steps {
                 script {
                     withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: 'https://hub.docker.com/repository/docker/mamatha0124/helloworld-java/general']) {
-                        sh 'docker push $DOCKER_IMAGE'
+                        sh 'docker push mamatha0124/helloworld-java:v3'
                     }
                 }
             }
