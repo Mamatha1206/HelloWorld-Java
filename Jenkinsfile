@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'mamatha0124/helloworld-java:v3'
-        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'  // Use your correct Jenkins Docker credentials ID
+        DOCKER_CREDENTIALS_ID = 'mamatha0124'  // Use your correct Jenkins Docker credentials ID
         KUBE_CREDENTIALS_ID = 'kubeconfig'  // Ensure correct Kubernetes credentials ID
     }
 
