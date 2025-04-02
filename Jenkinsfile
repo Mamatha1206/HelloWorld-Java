@@ -3,21 +3,21 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'mamatha0124/helloworld-java:v3'
-        DOCKER_CREDENTIALS_ID = 'mamatha0124'
-        KUBE_CREDENTIALS_ID = 'kubeconfig'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'  // Use your correct Jenkins Docker credentials ID
+        KUBE_CREDENTIALS_ID = 'kubeconfig'  // Ensure correct Kubernetes credentials ID
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git (url : 'https://github.com/Mamatha1206/helloworld-java.git', branch:'main')
+                git branch: 'main', url: 'https://github.com/Mamatha1206/helloworld-java.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t mamatha0124/helloworld-java:v3 .'
+                    sh "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
@@ -25,8 +25,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: 'https://hub.docker.com/repository/docker/mamatha0124/helloworld-java/general']) {
-                        sh 'docker push mamatha0124/helloworld-java:v3'
+                    withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: 'https://index.docker.io/v1/']) {
+                        sh "docker push ${DOCKER_IMAGE}"
                     }
                 }
             }
@@ -63,10 +63,10 @@ pipeline {
 
     post {
         success {
-            echo "Pipeline completed successfully!"
+            echo "✅ Pipeline completed successfully!"
         }
         failure {
-            echo "Pipeline failed! Check logs for errors."
+            echo "❌ Pipeline failed! Check logs for errors."
         }
     }
 }
