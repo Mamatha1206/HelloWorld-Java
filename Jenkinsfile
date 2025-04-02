@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'mamatha0124/helloworld-java:v3'
+        DOCKER_CREDENTIALS_ID = 'mamatha0124'
+        KUBE_CREDENTIALS_ID = 'kubeconfig'
     }
 
     stages {
@@ -14,38 +16,57 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                script {
+                    sh 'docker build -t $DOCKER_IMAGE .'
+                }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withDockerRegistry([credentialsId: 'docker-hub-credentials', url: '']) {
-                    sh 'docker push $DOCKER_IMAGE'
+                script {
+                    withDockerRegistry([credentialsId: DOCKER_CREDENTIALS_ID, url: 'https://hub.docker.com/repository/docker/mamatha0124/helloworld-java/general']) {
+                        sh 'docker push $DOCKER_IMAGE'
+                    }
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                withKubeConfig([credentialsId: 'kubeconfig']) {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
+                script {
+                    withKubeConfig([credentialsId: KUBE_CREDENTIALS_ID]) {
+                        sh 'kubectl apply -f deployment.yaml'
+                        sh 'kubectl apply -f service.yaml'
+                    }
                 }
             }
         }
 
         stage('Scale Deployment Up') {
             steps {
-                sh 'kubectl scale deployment helloworld-deployment --replicas=3'
+                script {
+                    sh 'kubectl scale deployment helloworld-deployment --replicas=3'
+                }
             }
         }
 
         stage('Scale Deployment Down') {
             steps {
-                input message: "Scale down deployment?", ok: "Yes"
-                sh 'kubectl scale deployment helloworld-deployment --replicas=1'
+                script {
+                    input message: "Scale down deployment?", ok: "Yes"
+                    sh 'kubectl scale deployment helloworld-deployment --replicas=1'
+                }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed! Check logs for errors."
         }
     }
 }
