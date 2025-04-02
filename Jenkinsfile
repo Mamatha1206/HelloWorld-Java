@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Mamatha1206/helloworld-java.git'
+                git (url : 'https://github.com/Mamatha1206/helloworld-java.git', branch:'main')
             }
         }
 
